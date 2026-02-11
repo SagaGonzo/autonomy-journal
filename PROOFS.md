@@ -16,4 +16,8 @@ Verified presence of release pack files on `main`:
 - **Determinism:** PASS (sha256 match)
 - **JSONL Validation:** PASS
 
+## Release Pack Merge Status
+**Status:** PENDING  
+Receipts will be added after verification completes.
+
 *This document is auto-generated from verified system states.*
