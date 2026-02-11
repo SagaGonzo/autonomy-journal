@@ -1,0 +1,9 @@
+# PII Allowlist - Patterns that are allowed in output
+# Format: One regex pattern per line
+
+# Example email domains that are acceptable (test data)
+.*@example\.com
+.*@test\.local
+
+# Test/placeholder phone numbers
+555-\d{3}-\d{4}
