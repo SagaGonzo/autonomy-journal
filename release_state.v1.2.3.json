@@ -1,0 +1,33 @@
+{
+  "version": "1.2.3",
+  "release_date": "2026-02-11",
+  "engineering_assets": [
+    "README.md",
+    "LICENSE",
+    "CITATION.cff",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md",
+    "ETHICS.md",
+    "PROOFS.md",
+    "MISSION.md",
+    "docs/PUBLIC_BUNDLE_V1.md",
+    "docs/EVAL1_ARTIFACT_SET.md",
+    "docs/EVAL2_DYNAMIC_THRESHOLD_SKETCH.md",
+    "schemas/autonomy_journal.v1.autonomy.schema.json",
+    "schemas/reality_state.v1.schema.json",
+    "tools/pii_scan.py",
+    "tools/pii_allowlist.regex",
+    "tools/validate_jsonl.py",
+    "tools/make_proofs.sh",
+    ".github/workflows/ci.yml",
+    ".github/workflows/release.yml",
+    "src/autonomy_journal/__init__.py",
+    "src/autonomy_journal/journal.py",
+    "src/autonomy_journal/schema.py"
+  ],
+  "metadata": {
+    "repro_hash": "0ced825ca45d52a7ab9160c1a97b1cb00f54d00fece33393ac17390b312a9504",
+    "description": "Deterministic, schema-first JSONL logs for toy agent simulations (verification-first)",
+    "status": "validated"
+  }
+}
