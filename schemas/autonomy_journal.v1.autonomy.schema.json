@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/SagaGonzo/autonomy-journal/schemas/autonomy_journal.v1.autonomy.schema.json",
+  "title": "Autonomy Journal Event Schema v1",
+  "description": "Schema for deterministic JSONL event logging in agent simulations",
+  "type": "object",
+  "required": ["timestamp", "event_type", "agent_id", "data"],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the event"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["agent_init", "agent_action", "agent_observation", "agent_termination", "system_state"],
+      "description": "Type of event being logged"
+    },
+    "agent_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "description": "Unique identifier for the agent"
+    },
+    "data": {
+      "type": "object",
+      "description": "Event-specific data payload"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Schema version"
+        },
+        "repro_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 hash for reproducibility verification"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Autonomy Journal"
+version: 1.2.3
+date-released: 2026-02-11
+url: "https://github.com/SagaGonzo/autonomy-journal"
+authors:
+  - name: "Autonomy Journal Contributors"
+license: MIT
+abstract: "Deterministic, schema-first JSONL logs for toy agent simulations (verification-first)."
