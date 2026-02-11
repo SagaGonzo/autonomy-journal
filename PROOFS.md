@@ -3,6 +3,9 @@
 ## Repository Verification
 - **URL:** https://github.com/SagaGonzo/autonomy-journal
 - **Visibility:** Public
+<<<<<<< HEAD
+- **Access Check:** 200 OK (Verified via GitHub API)
+=======
 - **Access Check:** 200 OK (Verified via curl -I)
 
 ### curl -I https://github.com/SagaGonzo/autonomy-journal
@@ -22,6 +25,7 @@ X-Frame-Options: deny
 X-Github-Request-Id: 4420:19BAAC:998CF35:CBCAFAB:698BFFB1
 X-Xss-Protection: 0
 ```
+>>>>>>> copilot/add-release-pack-v1-2-3
 
 ## Release Pack
 - **Version:** v1.2.3
@@ -30,6 +34,14 @@ X-Xss-Protection: 0
 ## Local Validation Receipts
 ```text
 # tools/make_proofs.sh output
+<<<<<<< HEAD
+PII_SCAN_PASS
+SCHEMA_OK schemas/autonomy_journal.v1.autonomy.schema.json
+SCHEMA_OK schemas/reality_state.v1.schema.json
+0ced825ca45d52a7ab9160c1a97b1cb00f54d00fece33393ac17390b312a9504  proofs/run1.jsonl
+0ced825ca45d52a7ab9160c1a97b1cb00f54d00fece33393ac17390b312a9504  proofs/run2.jsonl
+JSONL_VALIDATE_PASS
+=======
 Running PII scan...
 PII_SCAN_PASS
 Validating schemas...
@@ -43,6 +55,7 @@ Validating JSONL structure...
 JSONL_VALIDATE_PASS
 
 Proof generation complete!
+>>>>>>> copilot/add-release-pack-v1-2-3
 ```
 
 ## CI/CD
