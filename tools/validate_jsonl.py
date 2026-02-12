@@ -10,6 +10,7 @@ from jsonschema import validate, ValidationError
 
 def validate_jsonl_structure(filepath, schema=None):
     """Validate that file is proper JSONL format and optionally validate against schema."""
+    line_num = 0
     try:
         with open(filepath, 'r') as f:
             for line_num, line in enumerate(f, 1):
@@ -76,9 +77,7 @@ def main():
         jsonl_files = list(proofs_dir.glob('*.jsonl'))
         for jsonl_file in jsonl_files:
             valid, error = validate_jsonl_structure(jsonl_file, autonomy_schema)
-            if valid:
-                print(f"JSONL_VALIDATE_PASS {jsonl_file.name} (syntax + schema)")
-            else:
+            if not valid:
                 print(f"JSONL_INVALID {jsonl_file}: {error}")
                 jsonl_valid = False
     
