@@ -32,7 +32,7 @@ def main() -> int:
             print(f"SCHEMA_CHECK_FAIL {schema_path.name}: {e}")
     
     if all_valid:
-        print("✓ All schemas are valid")
+        print("SCHEMA_META_VALIDATE_PASS")
         return 0
     else:
         return 1
