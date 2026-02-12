@@ -18,6 +18,7 @@ def load_schema(schema_name):
 
 def validate_jsonl_structure(filepath, schema=None):
     """Validate that file is proper JSONL format and optionally validate instances."""
+    line_num = 0
     try:
         with open(filepath, 'r') as f:
             for line_num, line in enumerate(f, 1):
