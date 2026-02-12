@@ -12,7 +12,7 @@ Verified presence of release pack files on `main`:
 
 ## Local Validation (Sandbox)
 - **PII Scan:** PASS (tools/pii_scan.py)
-- **Schema Check:** PASS (Draft-07; meta-validation via jsonschema.validator_for + check_schema)
+- **Schema Check:** PASS (Draft-07 meta-validation)
 - **JSONL Validation:** PASS (syntax + schema instance validation)
 - **Determinism:** PASS (sha256 match)
 

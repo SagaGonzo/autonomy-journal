@@ -10,8 +10,8 @@ from jsonschema import validate, ValidationError
 
 def validate_jsonl_structure(filepath, schema=None):
     """Validate that file is proper JSONL format and optionally validate against schema."""
+    line_num = 0
     try:
-        line_num = 0
         with open(filepath, 'r') as f:
             for line_num, line in enumerate(f, 1):
                 if line.strip():
