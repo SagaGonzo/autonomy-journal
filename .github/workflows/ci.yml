@@ -27,7 +27,10 @@ jobs:
       - name: Run PII scan
         run: python3 tools/pii_scan.py
       
-      - name: Validate schemas
+      - name: Check schemas (meta-validation)
+        run: python3 tools/check_schemas.py
+      
+      - name: Validate JSONL (syntax + schema instances)
         run: python3 tools/validate_jsonl.py
       
       - name: Generate proofs
