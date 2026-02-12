@@ -1,36 +1,42 @@
-#!/bin/bash
-# Generate proof receipts for Autonomy Journal release pack
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Create proofs directory
 mkdir -p proofs
 
-# Run PII scan
-echo "Running PII scan..."
-python3 tools/pii_scan.py
+# Pull a valid hex repro hash from the library (no install required; use src/).
+REPRO_HASH="$(python3 -c "import sys; sys.path.insert(0,'src'); import autonomy_journal; print(getattr(autonomy_journal,'__repro_hash__',''))")"
+if [[ ! "$REPRO_HASH" =~ ^[a-f0-9]{64}$ ]]; then
+  echo "REPRO_HASH_INVALID $REPRO_HASH"
+  exit 1
+fi
 
-# Validate schemas
-echo "Validating schemas..."
-python3 tools/validate_jsonl.py | grep "SCHEMA_OK" || true
+VERSION="$(python3 -c "import sys; sys.path.insert(0,'src'); import autonomy_journal; print(getattr(autonomy_journal,'__version__',''))")"
+if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "VERSION_INVALID $VERSION"
+  exit 1
+fi
 
-# Generate deterministic test JSONL files
-echo "Generating test JSONL data..."
-cat > proofs/run1.jsonl << 'JSONL_EOF'
-{"timestamp":"2026-02-11T00:00:00Z","event_type":"agent_init","agent_id":"agent-001","data":{"initial_state":"ready"},"metadata":{"version":"1.2.3","repro_hash":"0ced825ca45d52a7ab9160c1a97b1cb00f54d00fece33393ac17390b312a9504"}}
-JSONL_EOF
+cat > proofs/run1.jsonl << EOF
+{"timestamp":"2026-02-11T05:40:00Z","event_type":"agent_init","agent_id":"agent-001","data":{"key":"value"},"metadata":{"version":"$VERSION","repro_hash":"$REPRO_HASH"}}
+EOF
 
-cat > proofs/run2.jsonl << 'JSONL_EOF'
-{"timestamp":"2026-02-11T00:00:00Z","event_type":"agent_init","agent_id":"agent-001","data":{"initial_state":"ready"},"metadata":{"version":"1.2.3","repro_hash":"0ced825ca45d52a7ab9160c1a97b1cb00f54d00fece33393ac17390b312a9504"}}
-JSONL_EOF
+cat > proofs/run2.jsonl << EOF
+{"timestamp":"2026-02-11T05:40:00Z","event_type":"agent_init","agent_id":"agent-001","data":{"key":"value"},"metadata":{"version":"$VERSION","repro_hash":"$REPRO_HASH"}}
+EOF
 
-# Generate SHA256 hashes
-echo "Generating checksums..."
-sha256sum proofs/run1.jsonl
-sha256sum proofs/run2.jsonl
+# Enforce: PII scan (repo root)
+python3 tools/pii_scan.py .
 
-# Validate JSONL structure
-echo "Validating JSONL structure..."
-python3 tools/validate_jsonl.py | grep "JSONL_VALIDATE_PASS" || true
+# Enforce: schemas valid + instances valid
+python3 tools/check_schemas.py
+python3 tools/validate_jsonl.py --schema schemas/autonomy_journal.v1.autonomy.schema.json proofs/run1.jsonl proofs/run2.jsonl
 
-echo ""
-echo "Proof generation complete!"
+# Enforce: determinism (run1 == run2)
+H1="$(sha256sum proofs/run1.jsonl | awk '{print $1}')"
+H2="$(sha256sum proofs/run2.jsonl | awk '{print $1}')"
+if [[ "$H1" != "$H2" ]]; then
+  echo "DETERMINISM_MISMATCH run1=$H1 run2=$H2"
+  exit 1
+fi
+echo "DETERMINISM_MATCH $H1"
+echo "PROOFS_OK"
