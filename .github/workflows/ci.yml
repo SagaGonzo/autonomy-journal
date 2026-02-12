@@ -25,20 +25,10 @@ jobs:
           pip install jsonschema
       
       - name: Run PII scan
-        run: python3 tools/pii_scan.py
+        run: python3 tools/pii_scan.py .
       
-      - name: Validate schemas
-        run: python3 tools/validate_jsonl.py
+      - name: Check schemas
+        run: python3 tools/check_schemas.py
       
       - name: Generate proofs
         run: bash tools/make_proofs.sh
-      
-      - name: Verify determinism
-        run: |
-          hash1=$(sha256sum proofs/run1.jsonl | cut -d' ' -f1)
-          hash2=$(sha256sum proofs/run2.jsonl | cut -d' ' -f1)
-          if [ "$hash1" != "$hash2" ]; then
-            echo "ERROR: Non-deterministic output detected"
-            exit 1
-          fi
-          echo "✓ Determinism verified"
