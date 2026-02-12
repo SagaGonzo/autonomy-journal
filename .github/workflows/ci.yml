@@ -27,6 +27,9 @@ jobs:
       - name: Run PII scan
         run: python3 tools/pii_scan.py
       
+      - name: Check schemas
+        run: python3 tools/check_schemas.py
+      
       - name: Validate schemas
         run: python3 tools/validate_jsonl.py
       
