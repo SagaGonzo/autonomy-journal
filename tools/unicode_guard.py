@@ -18,15 +18,39 @@ CHECK_PATTERNS = [
     '.gitignore'
 ]
 
-# Dangerous Unicode ranges
+# Dangerous Unicode ranges and characters
 DANGEROUS_CHARS = {
-    # Bidirectional text control characters
+    # Bidirectional text control characters (U+202A to U+202E)
     '\u202A', '\u202B', '\u202C', '\u202D', '\u202E',
     # Zero-width characters
     '\u200B', '\u200C', '\u200D', '\u2060', '\uFEFF',
+    # Line/paragraph separators
+    '\u2028', '\u2029',
     # Other invisible/formatting characters
     '\u00A0',  # Non-breaking space
+    '\u180E',  # Mongolian vowel separator
 }
+
+def is_dangerous_char(char):
+    """Check if a character is dangerous."""
+    if char in DANGEROUS_CHARS:
+        return True
+    
+    code_point = ord(char)
+    
+    # Bidirectional override and isolate characters (U+202A - U+202E, U+2066 - U+2069)
+    if 0x202A <= code_point <= 0x202E or 0x2066 <= code_point <= 0x2069:
+        return True
+    
+    # Zero-width characters
+    if code_point in (0x200B, 0x200C, 0x200D, 0x2060, 0xFEFF):
+        return True
+    
+    # Line and paragraph separators
+    if code_point in (0x2028, 0x2029):
+        return True
+    
+    return False
 
 def check_file(filepath):
     """Check a file for dangerous Unicode characters."""
@@ -38,16 +62,7 @@ def check_file(filepath):
             
         for line_num, line in enumerate(content.splitlines(), 1):
             for char_pos, char in enumerate(line, 1):
-                # Check for bidirectional and zero-width characters
-                if char in DANGEROUS_CHARS:
-                    violations.append({
-                        'line': line_num,
-                        'col': char_pos,
-                        'char': repr(char),
-                        'code': f'U+{ord(char):04X}'
-                    })
-                # Check for other control characters in visible range
-                elif ord(char) >= 0x2000 and ord(char) <= 0x2FFF:
+                if is_dangerous_char(char):
                     violations.append({
                         'line': line_num,
                         'col': char_pos,
