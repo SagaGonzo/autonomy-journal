@@ -4,7 +4,7 @@ Fail if files contain hidden Unicode (bidi, zero-width, NBSP-like).
 
 Tokens:
 - UNICODE_GUARD_PASS
-- UNICODE_GUARD_FAIL <file>:<file>:<file>:
+- UNICODE_GUARD_FAIL <file1>:<file2>:...
 """
 import sys
 import re
@@ -51,7 +51,7 @@ def scan_file_for_unicode(filepath):
     """Scan a file for dangerous Unicode characters."""
     violations = []
     try:
-        with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+        with open(filepath, 'r', encoding='utf-8', errors='strict') as f:
             for line_num, line in enumerate(f, 1):
                 for char in line:
                     if char in DANGEROUS_UNICODE:
@@ -61,8 +61,11 @@ def scan_file_for_unicode(filepath):
                             'name': DANGEROUS_UNICODE[char],
                             'codepoint': f'U+{ord(char):04X}'
                         })
-    except Exception as e:
-        # If we can't read the file, skip it (e.g., binary files)
+    except UnicodeDecodeError:
+        # Skip files that aren't valid UTF-8 (likely binary files)
+        return []
+    except (IOError, OSError):
+        # Skip files we can't read (permissions, etc.)
         return []
     
     return violations
