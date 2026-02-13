@@ -50,7 +50,8 @@ def should_skip(path):
 def scan_file(filepath):
     """Scan a single file for dangerous Unicode characters."""
     try:
-        with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+        # Try to read as text file - use strict mode to detect binary files
+        with open(filepath, 'r', encoding='utf-8', errors='strict') as f:
             content = f.read()
         
         issues = []
@@ -67,8 +68,11 @@ def scan_file(filepath):
                     })
         
         return issues
-    except (UnicodeDecodeError, PermissionError):
-        # Skip binary files and files we can't read
+    except UnicodeDecodeError:
+        # Skip binary files (images, compiled binaries, etc.)
+        return []
+    except PermissionError:
+        # Skip files we don't have permission to read
         return []
     except Exception as e:
         print(f"ERROR scanning {filepath}: {e}", file=sys.stderr)
