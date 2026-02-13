@@ -101,11 +101,17 @@ def should_scan(filepath):
     """Determine if a file should be scanned."""
     path = Path(filepath)
     
-    # Skip hidden directories like .git
-    if any(part.startswith('.') and part not in SCAN_DOTFILES for part in path.parts):
+    # Skip .git directory
+    if '.git' in path.parts:
         return False
     
-    # Scan dotfiles
+    # Skip other hidden directories (starting with .) except for files in root
+    for i, part in enumerate(path.parts):
+        if i > 0 and part.startswith('.') and path.parts[i-1] != '.':
+            # This is a hidden directory, not in root
+            return False
+    
+    # Scan dotfiles in root
     if path.name in SCAN_DOTFILES:
         return True
     

@@ -25,15 +25,23 @@ echo ""
 
 # Step 4: Extract version and repro_hash from release_state using AST parsing
 echo "Step 4: Extracting version and repro_hash..."
+
+# Find release_state file dynamically
+RELEASE_STATE_FILE=$(ls release_state.*.json 2>/dev/null | head -1)
+if [ -z "$RELEASE_STATE_FILE" ]; then
+    echo "ERROR: No release_state.*.json file found"
+    exit 1
+fi
+
 VERSION=$(python3 -c "
 import json
-with open('release_state.v1.2.3.json', 'r') as f:
+with open('$RELEASE_STATE_FILE', 'r') as f:
     data = json.load(f)
     print(data['version'])
 ")
 REPRO_HASH=$(python3 -c "
 import json
-with open('release_state.v1.2.3.json', 'r') as f:
+with open('$RELEASE_STATE_FILE', 'r') as f:
     data = json.load(f)
     print(data['metadata']['repro_hash'])
 ")

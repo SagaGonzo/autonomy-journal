@@ -39,9 +39,9 @@ def validate_schema_file(schema_path):
         
         return True, None
     except SchemaError as e:
-        return False, f"Schema validation error: {e.message}"
+        return False, f"Schema validation error: {str(e)}"
     except Exception as e:
-        return False, f"Unexpected error: {e}"
+        return False, f"Unexpected error: {str(e)}"
 
 
 def main():
