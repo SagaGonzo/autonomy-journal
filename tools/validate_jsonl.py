@@ -65,6 +65,7 @@ def main():
         print("JSONL_VALIDATE_PASS")
         return 0
     else:
+        print("JSONL_VALIDATE_FAIL")
         return 1
 
 if __name__ == '__main__':

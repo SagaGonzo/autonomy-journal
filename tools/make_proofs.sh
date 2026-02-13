@@ -1,6 +1,6 @@
 #!/bin/bash
 # Generate proof receipts for Autonomy Journal release pack
-set -e
+set -euo pipefail
 
 # Create proofs directory
 mkdir -p proofs
@@ -9,9 +9,13 @@ mkdir -p proofs
 echo "Running PII scan..."
 python3 tools/pii_scan.py
 
+# Check schemas
+echo "Checking schemas..."
+python3 tools/check_schemas.py
+
 # Validate schemas
 echo "Validating schemas..."
-python3 tools/validate_jsonl.py | grep "SCHEMA_OK" || true
+python3 tools/validate_jsonl.py
 
 # Generate deterministic test JSONL files
 echo "Generating test JSONL data..."
@@ -30,7 +34,17 @@ sha256sum proofs/run2.jsonl
 
 # Validate JSONL structure
 echo "Validating JSONL structure..."
-python3 tools/validate_jsonl.py | grep "JSONL_VALIDATE_PASS" || true
+python3 tools/validate_jsonl.py
 
-echo ""
+# Verify determinism
+echo "Verifying determinism..."
+hash1=$(sha256sum proofs/run1.jsonl | cut -d' ' -f1)
+hash2=$(sha256sum proofs/run2.jsonl | cut -d' ' -f1)
+if [ "$hash1" != "$hash2" ]; then
+    echo "DETERMINISM_FAIL"
+    exit 1
+fi
+echo "DETERMINISM_PASS"
+
+echo "PROOF_GENERATION_PASS"
 echo "Proof generation complete!"
