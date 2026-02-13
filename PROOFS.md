@@ -11,6 +11,7 @@ Verified presence of release pack files on `main`:
 - `.github/workflows/ci.yml`: **PRESENT**
 
 ## Local Validation (Sandbox)
+- **Unicode Guard:** PASS (tools/unicode_guard.py)
 - **PII Scan:** PASS (tools/pii_scan.py)
 - **Schema Check:** PASS (Draft 2020-12)
 - **Determinism:** PASS (sha256 match)

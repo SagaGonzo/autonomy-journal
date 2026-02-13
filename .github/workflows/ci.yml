@@ -24,6 +24,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install jsonschema
       
+      - name: Run Unicode guard
+        run: python3 tools/unicode_guard.py
+      
       - name: Run PII scan
         run: python3 tools/pii_scan.py
       

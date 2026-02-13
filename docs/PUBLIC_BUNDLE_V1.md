@@ -21,6 +21,7 @@ This bundle represents the first public release of the Autonomy Journal system, 
 - `schemas/reality_state.v1.schema.json` - Reality state schema
 
 ### Tools
+- `tools/unicode_guard.py` - Unicode security scanning
 - `tools/pii_scan.py` - PII detection and scanning
 - `tools/pii_allowlist.regex` - Allowed PII patterns
 - `tools/validate_jsonl.py` - JSONL validation
@@ -36,9 +37,10 @@ This bundle represents the first public release of the Autonomy Journal system, 
 ## Usage
 
 1. Install the package: `pip install -e .`
-2. Validate schemas: `python tools/validate_jsonl.py`
+2. Run Unicode guard: `python tools/unicode_guard.py`
 3. Run PII scan: `python tools/pii_scan.py`
-4. Generate proofs: `bash tools/make_proofs.sh`
+4. Validate schemas: `python tools/validate_jsonl.py`
+5. Generate proofs: `bash tools/make_proofs.sh`
 
 ## Version
 
