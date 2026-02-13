@@ -4,7 +4,7 @@ Fail if files contain hidden Unicode (bidi, zero-width, NBSP-like).
 
 Tokens:
 - UNICODE_GUARD_PASS
-- UNICODE_GUARD_FAIL <file1>:<file2>:...
+- UNICODE_GUARD_FAIL <file1>:<file2>:...:
 """
 import sys
 import re
