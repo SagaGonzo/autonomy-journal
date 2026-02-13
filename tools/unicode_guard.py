@@ -72,6 +72,7 @@ def main():
     repo_root = Path.cwd()
     
     # Files to scan: source code, configs, docs, scripts
+    # Note: .git/ and other skip_dirs are filtered by should_scan_file()
     scan_patterns = [
         '**/*.py',
         '**/*.sh',

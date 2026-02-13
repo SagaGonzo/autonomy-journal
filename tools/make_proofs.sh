@@ -34,10 +34,8 @@ for node in ast.walk(tree):
     if isinstance(node, ast.Assign):
         for target in node.targets:
             if isinstance(target, ast.Name) and target.id == '__version__':
-                if hasattr(node.value, 'value'):
-                    print(node.value.value)
-                else:
-                    print(node.value.s)
+                # Use .value for Python 3.8+ compatibility
+                print(node.value.value if hasattr(node.value, 'value') else node.value.s)
                 sys.exit(0)
 
 print('ERROR: Cannot find __version__', file=sys.stderr)
