@@ -4,7 +4,7 @@ Fail if files contain hidden Unicode (bidi, zero-width, NBSP-like).
 
 Tokens:
 - UNICODE_GUARD_PASS
-- UNICODE_GUARD_FAIL <file1>:<file2>:...:
+- UNICODE_GUARD_FAIL <file1> <file2> ...
 """
 import sys
 import re
@@ -129,8 +129,8 @@ def main():
     
     if violations:
         # Print failures with file list
-        failed_files = ':'.join(violations.keys())
-        print(f"UNICODE_GUARD_FAIL {failed_files}:")
+        failed_files = ' '.join(violations.keys())
+        print(f"UNICODE_GUARD_FAIL {failed_files}")
         print("")
         for filepath, file_violations in violations.items():
             print(f"File: {filepath}")
