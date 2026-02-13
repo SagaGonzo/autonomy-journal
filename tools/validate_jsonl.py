@@ -18,6 +18,9 @@ except ImportError:
     print("Install with: pip install jsonschema")
     sys.exit(1)
 
+# Maximum number of violations to display per file
+MAX_DISPLAYED_VIOLATIONS = 5
+
 def load_schema(schema_path):
     """Load a JSON schema from file."""
     try:
@@ -135,13 +138,13 @@ def main():
             print(f"✓ {jsonl_file.name} - valid")
         else:
             print(f"✗ {jsonl_file.name} - FAILED")
-            for v in violations[:5]:  # Show first 5 violations
+            for v in violations[:MAX_DISPLAYED_VIOLATIONS]:
                 if v['path']:
                     print(f"  Line {v['line']}: {v['path']} - {v['message']}")
                 else:
                     print(f"  Line {v['line']}: {v['message']}")
-            if len(violations) > 5:
-                print(f"  ... and {len(violations) - 5} more violation(s)")
+            if len(violations) > MAX_DISPLAYED_VIOLATIONS:
+                print(f"  ... and {len(violations) - MAX_DISPLAYED_VIOLATIONS} more violation(s)")
             all_passed = False
     
     # Print final result

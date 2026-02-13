@@ -22,31 +22,9 @@ echo ""
 
 # Step 4: Extract version and repro_hash using AST parsing (no imports)
 echo "[4/5] Extracting version and repro_hash..."
-VERSION=$(python3 -c "
-import ast
-with open('src/autonomy_journal/__init__.py', 'r') as f:
-    tree = ast.parse(f.read())
-for node in ast.walk(tree):
-    if isinstance(node, ast.Assign):
-        for target in node.targets:
-            if isinstance(target, ast.Name) and target.id == '__version__':
-                if isinstance(node.value, ast.Constant):
-                    print(node.value.value)
-" || echo "UNKNOWN")
+eval $(python3 tools/extract_metadata.py)
 
-REPRO_HASH=$(python3 -c "
-import ast
-with open('src/autonomy_journal/__init__.py', 'r') as f:
-    tree = ast.parse(f.read())
-for node in ast.walk(tree):
-    if isinstance(node, ast.Assign):
-        for target in node.targets:
-            if isinstance(target, ast.Name) and target.id == '__repro_hash__':
-                if isinstance(node.value, ast.Constant):
-                    print(node.value.value)
-" || echo "UNKNOWN")
-
-if [ "$VERSION" = "UNKNOWN" ] || [ "$REPRO_HASH" = "UNKNOWN" ]; then
+if [ -z "$VERSION" ] || [ -z "$REPRO_HASH" ]; then
     echo "ERROR: Failed to extract version or repro_hash from __init__.py"
     exit 1
 fi

@@ -90,7 +90,7 @@ def scan_file(filepath):
                             'name': DANGEROUS_UNICODE[char],
                             'codepoint': f'U+{ord(char):04X}'
                         })
-    except Exception as e:
+    except (IOError, OSError, UnicodeError) as e:
         print(f"WARNING: Could not scan {filepath}: {e}", file=sys.stderr)
     
     return violations
