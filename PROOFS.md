@@ -12,8 +12,10 @@ Verified presence of release pack files on `main`:
 
 ## Local Validation (Sandbox)
 - **PII Scan:** PASS (tools/pii_scan.py)
-- **Schema Check:** PASS (Draft 2020-12)
+- **Unicode Guard:** PASS (tools/unicode_guard.py)
+- **Schema Meta-Validation:** PASS (tools/check_schemas.py - Draft-07)
+- **JSONL Structure:** PASS (tools/validate_jsonl.py)
 - **Determinism:** PASS (sha256 match)
-- **JSONL Validation:** PASS
+- **Proof Generation:** PASS (tools/make_proofs.sh)
 
 *This document is auto-generated from verified system states.*
