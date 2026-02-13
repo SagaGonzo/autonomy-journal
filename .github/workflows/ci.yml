@@ -27,7 +27,13 @@ jobs:
       - name: Run PII scan
         run: python3 tools/pii_scan.py
       
-      - name: Validate schemas
+      - name: Run Unicode guard
+        run: python3 tools/unicode_guard.py
+      
+      - name: Meta-validate schemas
+        run: python3 tools/check_schemas.py
+      
+      - name: Validate JSONL structure
         run: python3 tools/validate_jsonl.py
       
       - name: Generate proofs

@@ -9,8 +9,16 @@ mkdir -p proofs
 echo "Running PII scan..."
 python3 tools/pii_scan.py
 
-# Validate schemas
-echo "Validating schemas..."
+# Run Unicode guard
+echo "Running Unicode guard..."
+python3 tools/unicode_guard.py
+
+# Meta-validate schemas
+echo "Meta-validating schemas..."
+python3 tools/check_schemas.py
+
+# Validate JSONL structure
+echo "Validating JSONL structure..."
 python3 tools/validate_jsonl.py | grep "SCHEMA_OK" || true
 
 # Generate deterministic test JSONL files
