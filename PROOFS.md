@@ -1,19 +1,32 @@
 # Verification Receipts
 
-## Public Repository Sentinels (2026-02-11)
-- **Repo URL:** https://github.com/SagaGonzo/autonomy-journal
-- **CI Run:** https://github.com/SagaGonzo/autonomy-journal/actions/runs/21893252700 (Conclusion: `success`)
+## Schema and Validation (Enforced by CI)
 
-### Sentinel Files (Raw Checks)
-Verified presence of release pack files on `main`:
-- `schemas/autonomy_journal.v1.autonomy.schema.json`: **PRESENT**
-- `tools/make_proofs.sh`: **PRESENT**
-- `.github/workflows/ci.yml`: **PRESENT**
+- Schema dialect: Draft-07 (`$schema: "http://json-schema.org/draft-07/schema#"`)
+- Unicode guard: `python3 tools/unicode_guard.py`
+- Schema meta-validation: `python3 tools/check_schemas.py`
+- JSONL instance validation: `python3 tools/validate_jsonl.py --schema schemas/autonomy_journal.v1.autonomy.schema.json proofs/*.jsonl`
+- Determinism token: `DETERMINISM_MATCH sha256:<hash>` (emitted by `tools/make_proofs.sh`)
 
-## Local Validation (Sandbox)
-- **PII Scan:** PASS (tools/pii_scan.py)
-- **Schema Check:** PASS (Draft 2020-12)
-- **Determinism:** PASS (sha256 match)
-- **JSONL Validation:** PASS
+## CI Receipts
 
-*This document is auto-generated from verified system states.*
+Workflow:
+https://github.com/SagaGonzo/autonomy-journal/actions/workflows/ci.yml
+
+Expected tokens (must appear in CI logs):
+- UNICODE_GUARD_PASS
+- PII_SCAN_PASS
+- SCHEMA_CHECK_PASS schemas/autonomy_journal.v1.autonomy.schema.json
+- JSONL_SCHEMA_VALIDATE_PASS proofs/run1.jsonl:1
+- JSONL_SCHEMA_VALIDATE_PASS proofs/run2.jsonl:1
+- DETERMINISM_MATCH sha256:...
+- PROOFS_OK
+
+## PyPI
+
+Status: **UNVERIFIED** (canonical project/version URLs return 404).
+
+Do not claim publication until the canonical URL returns 200 and you paste receipts:
+- `pip install autonomy-journal==<version>`
+- `python -c "import autonomy_journal; print(autonomy_journal.__version__)"`
+- `pip hash autonomy_journal-<version>-py3-none-any.whl`

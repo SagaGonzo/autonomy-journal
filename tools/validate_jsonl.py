@@ -1,71 +1,61 @@
 #!/usr/bin/env python3
 """
-JSONL Validator for Autonomy Journal
-Validates JSONL files against schemas.
+Validate JSONL files: parse + JSON Schema instance validation.
+
+Receipt tokens:
+  SCHEMA_CHECK_PASS <schema_path>
+  JSONL_SCHEMA_VALIDATE_PASS <file>:<line>
+  JSONL_SCHEMA_VALIDATE_FAIL <file>:<line> :: <message> @ <json_path>
+  JSONL_PARSE_FAIL <file>:<line> :: <message>
 """
+import argparse
 import json
-import sys
 from pathlib import Path
 
-def validate_jsonl_structure(filepath):
-    """Validate that file is proper JSONL format."""
-    try:
-        with open(filepath, 'r') as f:
+from jsonschema import FormatChecker
+from jsonschema import ValidationError
+from jsonschema.validators import validator_for
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--schema", required=True, help="Schema JSON file")
+    ap.add_argument("jsonl_files", nargs="+", help="JSONL files to validate")
+    args = ap.parse_args()
+
+    schema_path = Path(args.schema)
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    Validator = validator_for(schema)
+    Validator.check_schema(schema)
+    print(f"SCHEMA_CHECK_PASS {schema_path.as_posix()}")
+
+    validator = Validator(schema, format_checker=FormatChecker())
+
+    ok = True
+    for jsonl_path in args.jsonl_files:
+        p = Path(jsonl_path)
+        with p.open(encoding="utf-8") as f:
             for line_num, line in enumerate(f, 1):
-                if line.strip():
-                    json.loads(line)
-        return True, None
-    except json.JSONDecodeError as e:
-        return False, f"Line {line_num}: {str(e)}"
-    except Exception as e:
-        return False, str(e)
+                s = line.strip()
+                if not s:
+                    continue
+                try:
+                    instance = json.loads(s)
+                    validator.validate(instance)
+                    print(f"JSONL_SCHEMA_VALIDATE_PASS {p.as_posix()}:{line_num}")
+                except json.JSONDecodeError as e:
+                    ok = False
+                    print(f"JSONL_PARSE_FAIL {p.as_posix()}:{line_num} :: {e}")
+                except ValidationError as e:
+                    ok = False
+                    loc = "/".join(str(x) for x in e.absolute_path) or "$"
+                    print(
+                        f"JSONL_SCHEMA_VALIDATE_FAIL {p.as_posix()}:{line_num} :: {e.message} @ {loc}"
+                    )
 
-def validate_schemas():
-    """Validate that schema files are valid JSON."""
-    schemas_dir = Path('schemas')
-    if not schemas_dir.exists():
-        print("SCHEMA_MISSING schemas/")
-        return False
-    
-    schema_files = list(schemas_dir.glob('*.json'))
-    if not schema_files:
-        print("SCHEMA_MISSING No schema files found")
-        return False
-    
-    all_valid = True
-    for schema_file in schema_files:
-        try:
-            with open(schema_file, 'r') as f:
-                json.load(f)
-            print(f"SCHEMA_OK {schema_file}")
-        except json.JSONDecodeError as e:
-            print(f"SCHEMA_INVALID {schema_file}: {e}")
-            all_valid = False
-    
-    return all_valid
+    return 0 if ok else 1
 
-def main():
-    """Main validation function."""
-    # Validate schemas
-    schemas_valid = validate_schemas()
-    
-    # Validate JSONL files in proofs directory
-    proofs_dir = Path('proofs')
-    jsonl_valid = True
-    
-    if proofs_dir.exists():
-        jsonl_files = list(proofs_dir.glob('*.jsonl'))
-        for jsonl_file in jsonl_files:
-            valid, error = validate_jsonl_structure(jsonl_file)
-            if not valid:
-                print(f"JSONL_INVALID {jsonl_file}: {error}")
-                jsonl_valid = False
-    
-    if schemas_valid and jsonl_valid:
-        print("JSONL_VALIDATE_PASS")
-        return 0
-    else:
-        return 1
 
-if __name__ == '__main__':
-    sys.exit(main())
+if __name__ == "__main__":
+    raise SystemExit(main())
