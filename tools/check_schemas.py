@@ -3,7 +3,7 @@
 Meta-validate JSON schemas in ./schemas using the dialect declared by $schema.
 
 Receipt tokens:
-  SCHEMA_CHECK_PASS <file>:<file>:<file>:
+  SCHEMA_CHECK_PASS <file>:<file>:<file>
   SCHEMA_CHECK_FAIL <file> <reason>
 """
 import json
@@ -66,7 +66,7 @@ def main():
     if all_valid:
         # Generate receipt token with all validated schemas
         schema_list = ':'.join(valid_schemas)
-        print(f"SCHEMA_CHECK_PASS {schema_list}:")
+        print(f"SCHEMA_CHECK_PASS {schema_list}")
         return 0
     else:
         return 1
