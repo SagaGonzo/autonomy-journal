@@ -25,9 +25,13 @@ def main() -> int:
 
         try:
             text = p.read_text(encoding="utf-8", errors="strict")
-        except Exception:
+        except UnicodeDecodeError:
             ok = False
             print(f"UNICODE_GUARD_FAIL UTF8 {p.as_posix()}")
+            continue
+        except Exception as e:
+            ok = False
+            print(f"UNICODE_GUARD_FAIL READ_ERROR {p.as_posix()}: {type(e).__name__}")
             continue
 
         for charset, name in (

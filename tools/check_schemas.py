@@ -51,7 +51,7 @@ def main() -> int:
             print(f"SCHEMA_CHECK_FAIL {schema_file.name} Invalid schema: {e}")
             ok = False
         except Exception as e:
-            print(f"SCHEMA_CHECK_FAIL {schema_file.name} {e}")
+            print(f"SCHEMA_CHECK_FAIL {schema_file.name} Unexpected error: {type(e).__name__}")
             ok = False
 
     if ok:
