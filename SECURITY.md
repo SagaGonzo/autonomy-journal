@@ -21,6 +21,7 @@ We appreciate your efforts to responsibly disclose your findings.
 
 ## Security Measures
 
+- Unicode security scanning via `tools/unicode_guard.py` detects hidden/bidirectional Unicode characters
 - PII scanning is performed on all outputs via `tools/pii_scan.py`
 - Schema validation ensures data integrity
 - All operations are deterministic and auditable via JSONL logs
