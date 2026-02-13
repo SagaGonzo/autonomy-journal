@@ -101,17 +101,23 @@ def should_scan(filepath):
     """Determine if a file should be scanned."""
     path = Path(filepath)
     
-    # Skip .git directory
+    # Skip .git directory specifically (contains binary data and metadata)
     if '.git' in path.parts:
         return False
     
-    # Skip other hidden directories (starting with .) except for files in root
-    for i, part in enumerate(path.parts):
-        if i > 0 and part.startswith('.') and path.parts[i-1] != '.':
-            # This is a hidden directory, not in root
-            return False
+    # Skip hidden directories that appear after non-hidden directories
+    # Example: foo/.hidden/bar.py should be skipped
+    # But .github/workflows/ci.yml should be scanned
+    seen_nonhidden = False
+    for part in path.parts[:-1]:  # Exclude the filename itself
+        if part.startswith('.'):
+            # If we've seen a non-hidden directory before this, skip
+            if seen_nonhidden:
+                return False
+        else:
+            seen_nonhidden = True
     
-    # Scan dotfiles in root
+    # Scan dotfiles
     if path.name in SCAN_DOTFILES:
         return True
     

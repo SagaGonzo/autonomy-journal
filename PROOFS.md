@@ -69,4 +69,4 @@ PyPI receipts are not currently available. This document will be updated when Py
 
 ---
 
-*This document reflects the current state of the verification system. Last updated: 2026-02-13*
+*This document reflects the current state of the verification system.*

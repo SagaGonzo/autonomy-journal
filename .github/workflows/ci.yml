@@ -39,7 +39,7 @@ jobs:
       - name: Verify PROOFS.md accuracy
         run: |
           # Verify PROOFS.md does not claim "2020-12" if schema is Draft-07
-          if grep -q "Draft 2020-12" PROOFS.md && grep -q 'draft-07/schema' schemas/*.json; then
+          if grep -q "Draft 2020-12" PROOFS.md && grep -q 'draft-07' schemas/*.json; then
             echo "ERROR: PROOFS.md claims Draft 2020-12 but schemas use Draft-07"
             exit 1
           fi
