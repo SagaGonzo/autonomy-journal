@@ -2,7 +2,7 @@
 """
 Meta-validate JSON schemas in ./schemas.
 Tokens:
-  SCHEMA_CHECK_PASS <file>:<file>:<file>:
+  SCHEMA_CHECK_PASS <file>:<file>:<file>
   SCHEMA_CHECK_FAIL <file> <reason>
 """
 import json
@@ -56,7 +56,7 @@ def main() -> int:
 
     if ok:
         files_str = ":".join(validated_files)
-        print(f"SCHEMA_CHECK_PASS {files_str}:")
+        print(f"SCHEMA_CHECK_PASS {files_str}")
     
     return 0 if ok else 1
 
