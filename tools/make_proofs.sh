@@ -1,6 +1,6 @@
 #!/bin/bash
 # Generate proof receipts for Autonomy Journal release pack
-set -e
+set -euo pipefail
 
 # Create proofs directory
 mkdir -p proofs
@@ -30,7 +30,7 @@ sha256sum proofs/run2.jsonl
 
 # Validate JSONL structure
 echo "Validating JSONL structure..."
-python3 tools/validate_jsonl.py | grep "JSONL_VALIDATE_PASS" || true
+python3 tools/validate_jsonl.py
 
 echo ""
-echo "Proof generation complete!"
+echo "PROOFS_OK"
