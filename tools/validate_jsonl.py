@@ -1,71 +1,126 @@
 #!/usr/bin/env python3
 """
-JSONL Validator for Autonomy Journal
-Validates JSONL files against schemas.
+JSONL Schema Instance Validator for Autonomy Journal
+Validates JSONL files against JSON Schema definitions.
+Performs full schema validation, not just JSON parsing.
+Fail-closed design: exit 1 on any validation failure.
 """
-import json
 import sys
+import json
+import argparse
 from pathlib import Path
 
-def validate_jsonl_structure(filepath):
-    """Validate that file is proper JSONL format."""
-    try:
-        with open(filepath, 'r') as f:
-            for line_num, line in enumerate(f, 1):
-                if line.strip():
-                    json.loads(line)
-        return True, None
-    except json.JSONDecodeError as e:
-        return False, f"Line {line_num}: {str(e)}"
-    except Exception as e:
-        return False, str(e)
+try:
+    import jsonschema
+    from jsonschema import validators
+except ImportError:
+    print("JSONL_SCHEMA_VALIDATE_FAIL: jsonschema package not installed")
+    print("Run: pip install jsonschema")
+    sys.exit(1)
 
-def validate_schemas():
-    """Validate that schema files are valid JSON."""
-    schemas_dir = Path('schemas')
-    if not schemas_dir.exists():
-        print("SCHEMA_MISSING schemas/")
-        return False
+
+def load_schema(schema_path):
+    """Load and validate a JSON Schema file."""
+    try:
+        with open(schema_path, 'r', encoding='utf-8') as f:
+            schema = json.load(f)
+        
+        # Validate the schema itself
+        validator_class = validators.validator_for(schema)
+        validator_class.check_schema(schema)
+        
+        return schema
+    except Exception as e:
+        print(f"JSONL_SCHEMA_VALIDATE_FAIL: Could not load schema {schema_path}: {e}")
+        sys.exit(1)
+
+
+def validate_jsonl_against_schema(jsonl_path, schema):
+    """
+    Validate a JSONL file against a JSON Schema.
+    Returns (is_valid, errors_list).
+    """
+    errors = []
+    # Use the appropriate validator class for the schema
+    validator_class = validators.validator_for(schema)
+    validator = validator_class(schema)
     
-    schema_files = list(schemas_dir.glob('*.json'))
-    if not schema_files:
-        print("SCHEMA_MISSING No schema files found")
-        return False
+    try:
+        with open(jsonl_path, 'r', encoding='utf-8') as f:
+            for line_num, line in enumerate(f, 1):
+                line = line.strip()
+                if not line:
+                    continue
+                
+                try:
+                    instance = json.loads(line)
+                except json.JSONDecodeError as e:
+                    errors.append((line_num, f"JSON parse error: {e}"))
+                    continue
+                
+                # Validate instance against schema
+                validation_errors = list(validator.iter_errors(instance))
+                if validation_errors:
+                    for error in validation_errors:
+                        error_path = '.'.join(str(p) for p in error.path) if error.path else 'root'
+                        errors.append((line_num, f"Schema validation error at {error_path}: {error.message}"))
     
-    all_valid = True
-    for schema_file in schema_files:
-        try:
-            with open(schema_file, 'r') as f:
-                json.load(f)
-            print(f"SCHEMA_OK {schema_file}")
-        except json.JSONDecodeError as e:
-            print(f"SCHEMA_INVALID {schema_file}: {e}")
-            all_valid = False
+    except Exception as e:
+        errors.append((0, f"File read error: {e}"))
     
-    return all_valid
+    return len(errors) == 0, errors
+
 
 def main():
-    """Main validation function."""
-    # Validate schemas
-    schemas_valid = validate_schemas()
+    """Main entry point."""
+    parser = argparse.ArgumentParser(
+        description='Validate JSONL files against JSON Schema'
+    )
+    parser.add_argument(
+        'jsonl_files',
+        nargs='+',
+        help='JSONL files to validate'
+    )
+    parser.add_argument(
+        '--schema',
+        required=True,
+        help='Path to JSON Schema file'
+    )
     
-    # Validate JSONL files in proofs directory
-    proofs_dir = Path('proofs')
-    jsonl_valid = True
+    args = parser.parse_args()
     
-    if proofs_dir.exists():
-        jsonl_files = list(proofs_dir.glob('*.jsonl'))
-        for jsonl_file in jsonl_files:
-            valid, error = validate_jsonl_structure(jsonl_file)
-            if not valid:
-                print(f"JSONL_INVALID {jsonl_file}: {error}")
-                jsonl_valid = False
+    # Load schema
+    schema = load_schema(args.schema)
     
-    if schemas_valid and jsonl_valid:
-        print("JSONL_VALIDATE_PASS")
+    all_valid = True
+    
+    for jsonl_file in args.jsonl_files:
+        jsonl_path = Path(jsonl_file)
+        
+        if not jsonl_path.exists():
+            print(f"JSONL_SCHEMA_VALIDATE_FAIL: File not found: {jsonl_file}")
+            all_valid = False
+            continue
+        
+        is_valid, errors = validate_jsonl_against_schema(jsonl_path, schema)
+        
+        if is_valid:
+            print(f"JSONL_SCHEMA_VALIDATE_OK: {jsonl_file}")
+        else:
+            print(f"JSONL_SCHEMA_VALIDATE_FAIL: {jsonl_file}")
+            for line_num, error_msg in errors:
+                if line_num > 0:
+                    print(f"  Line {line_num}: {error_msg}")
+                else:
+                    print(f"  {error_msg}")
+            all_valid = False
+    
+    if all_valid:
+        print("JSONL_SCHEMA_VALIDATE_PASS")
         return 0
     else:
         return 1
+
 
 if __name__ == '__main__':
     sys.exit(main())
