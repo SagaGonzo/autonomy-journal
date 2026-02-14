@@ -31,17 +31,13 @@ def main():
     
     if proofs_dir.exists():
         jsonl_files = list(proofs_dir.glob('*.jsonl'))
-        if jsonl_files:
-            for jsonl_file in jsonl_files:
-                valid, error = validate_jsonl_structure(jsonl_file)
-                if not valid:
-                    print(f"JSONL_PARSE_FAIL {jsonl_file}: {error}")
-                    jsonl_valid = False
-                else:
-                    print(f"JSONL_PARSE_PASS {jsonl_file.name}")
-        else:
-            # No JSONL files to validate
-            pass
+        for jsonl_file in jsonl_files:
+            valid, error = validate_jsonl_structure(jsonl_file)
+            if not valid:
+                print(f"JSONL_PARSE_FAIL {jsonl_file}: {error}")
+                jsonl_valid = False
+            else:
+                print(f"JSONL_PARSE_PASS {jsonl_file.name}")
     
     if jsonl_valid:
         print("JSONL_VALIDATE_PASS")

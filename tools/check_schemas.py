@@ -32,9 +32,16 @@ def check_schema_file(filepath):
         if "$schema" not in schema:
             return False, "Missing $schema declaration"
         
-        # Enforce Draft-07
+        # Enforce Draft-07 - check against known valid URIs
+        VALID_DRAFT7_URIS = {
+            "http://json-schema.org/draft-07/schema#",
+            "http://json-schema.org/draft-07/schema",
+            "https://json-schema.org/draft-07/schema#",
+            "https://json-schema.org/draft-07/schema",
+        }
+        
         schema_uri = schema["$schema"]
-        if "draft-07" not in schema_uri.lower() and "draft/7" not in schema_uri.lower():
+        if schema_uri not in VALID_DRAFT7_URIS:
             return False, f"Not Draft-07 schema: {schema_uri}"
         
         # Validate schema structure using jsonschema library
