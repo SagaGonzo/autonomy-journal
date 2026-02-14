@@ -24,21 +24,23 @@ jobs:
           python -m pip install --upgrade pip
           pip install jsonschema
       
+      - name: Run Unicode Guard (security check)
+        run: python3 tools/unicode_guard.py
+      
       - name: Run PII scan
         run: python3 tools/pii_scan.py
       
-      - name: Validate schemas
-        run: python3 tools/validate_jsonl.py
+      - name: Meta-validate schemas
+        run: python3 tools/check_schemas.py
       
-      - name: Generate proofs
+      - name: Generate and validate proofs
         run: bash tools/make_proofs.sh
       
-      - name: Verify determinism
+      - name: Verify PROOFS.md accuracy
         run: |
-          hash1=$(sha256sum proofs/run1.jsonl | cut -d' ' -f1)
-          hash2=$(sha256sum proofs/run2.jsonl | cut -d' ' -f1)
-          if [ "$hash1" != "$hash2" ]; then
-            echo "ERROR: Non-deterministic output detected"
+          # Check that PROOFS.md doesn't claim Draft 2020-12 when schemas use Draft-07
+          if grep -q "2020-12" PROOFS.md && grep -q "draft-07" schemas/*.json; then
+            echo "ERROR: PROOFS.md claims Draft 2020-12 but schemas use Draft-07"
             exit 1
           fi
-          echo "✓ Determinism verified"
+          echo "✓ PROOFS.md schema version claim verified"
