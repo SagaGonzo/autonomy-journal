@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
 JSONL Validator for Autonomy Journal
-Validates JSONL files against schemas.
+Validates JSONL files for proper format.
+Emits: JSONL_VALIDATE_PASS/FAIL
+
+Note: Schema meta-validation is done separately by check_schemas.py
 """
 import json
 import sys
@@ -20,35 +23,8 @@ def validate_jsonl_structure(filepath):
     except Exception as e:
         return False, str(e)
 
-def validate_schemas():
-    """Validate that schema files are valid JSON."""
-    schemas_dir = Path('schemas')
-    if not schemas_dir.exists():
-        print("SCHEMA_MISSING schemas/")
-        return False
-    
-    schema_files = list(schemas_dir.glob('*.json'))
-    if not schema_files:
-        print("SCHEMA_MISSING No schema files found")
-        return False
-    
-    all_valid = True
-    for schema_file in schema_files:
-        try:
-            with open(schema_file, 'r') as f:
-                json.load(f)
-            print(f"SCHEMA_OK {schema_file}")
-        except json.JSONDecodeError as e:
-            print(f"SCHEMA_INVALID {schema_file}: {e}")
-            all_valid = False
-    
-    return all_valid
-
 def main():
     """Main validation function."""
-    # Validate schemas
-    schemas_valid = validate_schemas()
-    
     # Validate JSONL files in proofs directory
     proofs_dir = Path('proofs')
     jsonl_valid = True
@@ -58,13 +34,16 @@ def main():
         for jsonl_file in jsonl_files:
             valid, error = validate_jsonl_structure(jsonl_file)
             if not valid:
-                print(f"JSONL_INVALID {jsonl_file}: {error}")
+                print(f"JSONL_PARSE_FAIL {jsonl_file}: {error}")
                 jsonl_valid = False
+            else:
+                print(f"JSONL_PARSE_PASS {jsonl_file.name}")
     
-    if schemas_valid and jsonl_valid:
+    if jsonl_valid:
         print("JSONL_VALIDATE_PASS")
         return 0
     else:
+        print("JSONL_VALIDATE_FAIL")
         return 1
 
 if __name__ == '__main__':

@@ -24,10 +24,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install jsonschema
       
+      - name: Unicode guard (first security gate)
+        run: python3 tools/unicode_guard.py
+      
       - name: Run PII scan
         run: python3 tools/pii_scan.py
       
-      - name: Validate schemas
+      - name: Check schemas (Draft-07 meta-validation)
+        run: python3 tools/check_schemas.py
+      
+      - name: Validate JSONL
         run: python3 tools/validate_jsonl.py
       
       - name: Generate proofs
