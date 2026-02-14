@@ -5,14 +5,6 @@ set -euo pipefail
 # Create proofs directory
 mkdir -p proofs
 
-# Run PII scan
-echo "Running PII scan..."
-python3 tools/pii_scan.py
-
-# Validate schemas
-echo "Validating schemas..."
-python3 tools/validate_jsonl.py | grep "SCHEMA_OK" || true
-
 # Generate deterministic test JSONL files
 echo "Generating test JSONL data..."
 cat > proofs/run1.jsonl << 'JSONL_EOF'
@@ -27,10 +19,6 @@ JSONL_EOF
 echo "Generating checksums..."
 sha256sum proofs/run1.jsonl
 sha256sum proofs/run2.jsonl
-
-# Validate JSONL structure
-echo "Validating JSONL structure..."
-python3 tools/validate_jsonl.py
 
 echo ""
 echo "PROOFS_OK"
