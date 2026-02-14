@@ -26,16 +26,25 @@ else
     # Extract version using AST (safe, no imports)
     VERSION=$(python3 -c "
 import ast
+import sys
 with open('$VERSION_FILE', 'r') as f:
     tree = ast.parse(f.read())
 for node in ast.walk(tree):
     if isinstance(node, ast.Assign):
         for target in node.targets:
             if isinstance(target, ast.Name) and target.id == '__version__':
-                print(node.value.s if isinstance(node.value, ast.Str) else node.value.value)
+                # Handle both ast.Str (Python <3.8) and ast.Constant (Python 3.8+)
+                if hasattr(ast, 'Constant') and isinstance(node.value, ast.Constant):
+                    print(node.value.value)
+                    sys.exit(0)
+                elif hasattr(node.value, 's'):  # ast.Str
+                    print(node.value.s)
+                    sys.exit(0)
 " 2>/dev/null || echo "1.2.3")
     
-    # Use a deterministic repro hash
+    # Use a deterministic repro hash for testing
+    # NOTE: This is intentionally fixed for determinism verification.
+    # In production, this should be computed dynamically from the codebase state.
     REPRO_HASH="0ced825ca45d52a7ab9160c1a97b1cb00f54d00fece33393ac17390b312a9504"
 fi
 

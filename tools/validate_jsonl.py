@@ -12,7 +12,7 @@ from pathlib import Path
 
 try:
     import jsonschema
-    from jsonschema import validators, Draft7Validator
+    from jsonschema import validators
 except ImportError:
     print("JSONL_SCHEMA_VALIDATE_FAIL: jsonschema package not installed")
     print("Run: pip install jsonschema")
@@ -41,7 +41,9 @@ def validate_jsonl_against_schema(jsonl_path, schema):
     Returns (is_valid, errors_list).
     """
     errors = []
-    validator = Draft7Validator(schema)
+    # Use the appropriate validator class for the schema
+    validator_class = validators.validator_for(schema)
+    validator = validator_class(schema)
     
     try:
         with open(jsonl_path, 'r', encoding='utf-8') as f:
