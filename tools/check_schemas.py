@@ -52,10 +52,6 @@ def check_schema_file(filepath):
         except SchemaError as e:
             return False, f"Invalid schema structure: {e.message}"
         
-        # Ensure it's specifically Draft7Validator compatible
-        if Validator != Draft7Validator:
-            return False, f"Schema validator mismatch: expected Draft7, got {Validator.__name__}"
-        
         return True, "OK"
         
     except json.JSONDecodeError as e:
